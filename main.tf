@@ -1,4 +1,5 @@
 locals {
+  name = upper("${var.org}_${var.environment}_tgw_${var.region == null ? data.aws_region.current.id : var.region}")
   # List of maps with key and route values
   vpc_attachments_with_routes = chunklist(flatten([
     for k, v in var.vpc_attachments : setproduct([{ key = k }], v.tgw_routes) if var.create_tgw && can(v.tgw_routes)
@@ -6,7 +7,7 @@ locals {
 
   tgw_default_route_table_tags_merged = merge(
     var.tags,
-    { Name = var.name },
+    { Name = local.name },
     var.tgw_default_route_table_tags,
   )
 
@@ -30,7 +31,7 @@ resource "aws_ec2_transit_gateway" "this" {
 
   region = var.region
 
-  description                        = coalesce(var.description, var.name)
+  description                        = coalesce(var.description, local.name)
   amazon_side_asn                    = var.amazon_side_asn
   default_route_table_association    = var.enable_default_route_table_association ? "enable" : "disable"
   default_route_table_propagation    = var.enable_default_route_table_propagation ? "enable" : "disable"
@@ -52,7 +53,7 @@ resource "aws_ec2_transit_gateway" "this" {
 
   tags = merge(
     var.tags,
-    { Name = var.name },
+    { Name = local.name },
     var.tgw_tags,
   )
 }
@@ -89,7 +90,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
 
   tags = merge(
     var.tags,
-    { Name = var.name },
+    { Name = local.name },
     var.tgw_vpc_attachment_tags,
     try(each.value.tags, {}),
   )
@@ -110,7 +111,7 @@ resource "aws_ec2_transit_gateway_route_table" "this" {
 
   tags = merge(
     var.tags,
-    { Name = var.name },
+    { Name = local.name },
     var.tgw_route_table_tags,
   )
 }
@@ -172,7 +173,7 @@ resource "aws_ec2_transit_gateway_route_table_propagation" "this" {
 ################################################################################
 
 locals {
-  ram_name = coalesce(var.ram_name, var.name)
+  ram_name = coalesce(var.ram_name, local.name)
 }
 
 resource "aws_ram_resource_share" "this" {
