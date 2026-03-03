@@ -1,7 +1,15 @@
-variable "name" {
-  description = "Name to be used on all the resources as identifier"
+variable "org" {
+  type    = string
+  default = "sccm"
+}
+
+variable "environment" {
   type        = string
-  default     = ""
+  description = "Application environment (dev, qa, stg, uat, prod)"
+  validation {
+    condition     = contains(["dev", "qa", "stg", "uat", "prod"], var.environment)
+    error_message = "Valid values for environment: dev, qa, stg, uat, prod"
+  }
 }
 
 variable "tags" {
