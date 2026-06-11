@@ -1,5 +1,5 @@
 locals {
-  name = upper("${var.org}_${var.environment}_tgw_${var.region == null ? data.aws_region.current.name : var.region}")
+  name = upper("${var.org}_${var.environment}_tgw_${var.region == null ? data.aws_region.current.region : var.region}")
   # List of maps with key and route values
   vpc_attachments_with_routes = chunklist(flatten([
     for k, v in var.vpc_attachments : setproduct([{ key = k }], v.tgw_routes) if var.create_tgw && can(v.tgw_routes)
