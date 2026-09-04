@@ -24,6 +24,12 @@ variable "region" {
   default     = null
 }
 
+variable "name_override" {
+  description = "Do you realllly need to override the standardized name creation? If yes, enter it here."
+  type = string
+  default = ""
+}
+
 ################################################################################
 # Transit Gateway
 ################################################################################
